@@ -3,6 +3,7 @@ import 'dart:math' as math;
 import 'dart:ui';
 import 'package:brick_braker_game/components/ball.dart';
 import 'package:brick_braker_game/components/bat.dart';
+import 'package:brick_braker_game/components/brick.dart';
 import 'package:brick_braker_game/components/play_area.dart';
 import 'package:brick_braker_game/config.dart';
 import 'package:flame/components.dart';
@@ -36,6 +37,7 @@ class BrickBreaker extends FlameGame
 
     world.add(
       Ball(
+        difficultyModifier: difficultyModifier,
         position: size / 2,
         radius: ballRadius,
         velocity: Vector2(
@@ -53,28 +55,40 @@ class BrickBreaker extends FlameGame
       ),
     );
 
+    await world.addAll([
+      for (var i = 0; i < brickColors.length; i++)
+        for (var j = 1; j <= 5; j++)
+          Brick(
+            position: Vector2(
+              (i + 0.5) * brickWidth + (i + 1) * brickGutter,
+              (j + 2.0) * brickHeight + j * brickGutter,
+            ),
+            color: brickColors[i],
+          ),
+    ]);
+
     debugMode = true;
   }
-@override
-KeyEventResult onKeyEvent(
-  KeyEvent event,
-  Set<LogicalKeyboardKey> keysPressed,
-) {
-  super.onKeyEvent(event, keysPressed);
 
-  if (event is KeyDownEvent) {
-    switch (event.logicalKey) {
-      case LogicalKeyboardKey.arrowLeft:
-        world.children.query<Bat>().first.moveBy(-batStep);
-        break;
+  @override
+  KeyEventResult onKeyEvent(
+    KeyEvent event,
+    Set<LogicalKeyboardKey> keysPressed,
+  ) {
+    super.onKeyEvent(event, keysPressed);
 
-      case LogicalKeyboardKey.arrowRight:
-        world.children.query<Bat>().first.moveBy(batStep);
-        break;
+    if (event is KeyDownEvent) {
+      switch (event.logicalKey) {
+        case LogicalKeyboardKey.arrowLeft:
+          world.children.query<Bat>().first.moveBy(-batStep);
+          break;
+
+        case LogicalKeyboardKey.arrowRight:
+          world.children.query<Bat>().first.moveBy(batStep);
+          break;
+      }
     }
+
+    return KeyEventResult.handled;
   }
-
-  return KeyEventResult.handled;
-}
-
 }

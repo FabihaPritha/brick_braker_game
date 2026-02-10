@@ -3,8 +3,8 @@ import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
 import 'package:flame/effects.dart';
 import 'package:flutter/material.dart';
-
 import 'bat.dart';
+import 'brick.dart';
 import 'play_area.dart';
 
 class Ball extends CircleComponent
@@ -13,16 +13,18 @@ class Ball extends CircleComponent
     required this.velocity,
     required super.position,
     required double radius,
+    required this.difficultyModifier,
   }) : super(
-         radius: radius,
-         anchor: Anchor.center,
-         paint: Paint()
-           ..color = const Color(0xff1e6091)
-           ..style = PaintingStyle.fill,
-         children: [CircleHitbox()],
-       );
+          radius: radius,
+          anchor: Anchor.center,
+          paint: Paint()
+            ..color = const Color(0xff1e6091)
+            ..style = PaintingStyle.fill,
+          children: [CircleHitbox()],
+        );
 
   Vector2 velocity;
+  final double difficultyModifier;
 
   @override
   void update(double dt) {
@@ -39,34 +41,50 @@ class Ball extends CircleComponent
 
     // ─────────── Walls ───────────
     if (other is PlayArea) {
-      final collisionPoint = intersectionPoints.first;
+      final p = intersectionPoints.first;
 
-      // Left / Right walls
-      if (collisionPoint.x <= 0 || collisionPoint.x >= game.width) {
+      // Left / Right
+      if (p.x <= 0 || p.x >= game.size.x) {
         velocity.x = -velocity.x;
       }
 
-      // Top wall
-      if (collisionPoint.y <= 0) {
+      // Top
+      if (p.y <= 0) {
         velocity.y = -velocity.y;
       }
 
-      // Bottom wall → remove ball with delay
-      if (collisionPoint.y >= game.height) {
+      // Bottom
+      if (p.y >= game.size.y) {
         add(RemoveEffect(delay: 0.35));
       }
     }
+
     // ─────────── Bat ───────────
     else if (other is Bat) {
       velocity.y = -velocity.y;
 
-      // Add angle based on hit position
       velocity.x +=
-          (position.x - other.position.x) / other.size.x * game.width * 0.3;
+          (position.x - other.position.x) /
+          other.size.x *
+          game.size.x *
+          0.3;
     }
-    // ─────────── Debug ───────────
-    else {
-      debugPrint('collision with $other');
+
+    // ─────────── Brick ───────────
+    else if (other is Brick) {
+      final brickTop = other.position.y - other.size.y / 2;
+      final brickBottom = other.position.y + other.size.y / 2;
+      final brickLeft = other.position.x - other.size.x / 2;
+      final brickRight = other.position.x + other.size.x / 2;
+
+      if (position.y < brickTop || position.y > brickBottom) {
+        velocity.y = -velocity.y;
+      } else if (position.x < brickLeft || position.x > brickRight) {
+        velocity.x = -velocity.x;
+      }
+
+      // Increase difficulty (speed)
+      velocity *= difficultyModifier;
     }
   }
 }
