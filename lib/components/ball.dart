@@ -55,7 +55,10 @@ class Ball extends CircleComponent
 
       // Bottom
       if (p.y >= game.size.y) {
-        add(RemoveEffect(delay: 0.35));
+        add(RemoveEffect(delay: 0.35,
+        onComplete: (){
+          game.playState = PlayState.gameOver;
+        }));
       }
     }
 

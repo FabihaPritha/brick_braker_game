@@ -33,6 +33,7 @@ class Brick extends RectangleComponent
 
       // If this was the last brick → end round
       if (game.world.children.query<Brick>().isEmpty) {
+        game.playState = PlayState.won;
         game.world.removeAll(
           game.world.children.query<Ball>(),
         );
