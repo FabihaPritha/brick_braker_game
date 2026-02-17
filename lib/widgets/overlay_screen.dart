@@ -8,12 +8,11 @@ class OverlayScreen extends StatelessWidget {
   final String title;
   final String subtitle;
 
-
   @override
   Widget build(BuildContext context) {
     return Container(
       alignment: const Alignment(0, -0.15),
-      child:  Column(
+      child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
           Text(
@@ -21,16 +20,13 @@ class OverlayScreen extends StatelessWidget {
             style: Theme.of(context).textTheme.headlineLarge,
           ).animate().slideY(duration: 750.ms, begin: -3, end: 0),
           const SizedBox(height: 16),
-          Text(
-            subtitle,
-            style: Theme.of(context).textTheme.headlineSmall,
-          ).animate(onPlay: (controller) => controller.repeat())
-          .fadeIn(duration: 1.seconds)
-          .then()
-          .fadeOut(duration: 1.seconds),
+          Text(subtitle, style: Theme.of(context).textTheme.headlineSmall)
+              .animate(onPlay: (controller) => controller.repeat())
+              .fadeIn(duration: 1.seconds)
+              .then()
+              .fadeOut(duration: 1.seconds),
         ],
       ),
     );
-
   }
 }
