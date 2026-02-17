@@ -30,6 +30,8 @@ class Brick extends RectangleComponent
     // Remove this brick when hit by the ball
     if (other is Ball) {
       removeFromParent();
+      game.score.value++;
+
 
       // If this was the last brick → end round
       if (game.world.children.query<Brick>().isEmpty) {
